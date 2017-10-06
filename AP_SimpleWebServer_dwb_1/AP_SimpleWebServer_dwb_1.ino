@@ -97,7 +97,7 @@ void setup() {
 
   // by default the local IP address of will be 192.168.1.1
   // you can override it with the following:
-   WiFi.config(IPAddress(10, 0, 0, 1));
+   WiFi.config(IPAddress(10, 0, 0, 2));
 
   // print the network name (SSID);
   Serial.print("Creating access point named: ");
@@ -112,7 +112,7 @@ void setup() {
   }
 
   // wait 10 seconds for connection:
-  delay(10000);
+  delay(2000);
 
   // start the web server on port 80
   server.begin();
@@ -172,33 +172,9 @@ void loop() {
             client.println();
 
             // the content of the HTTP response follows the header:
-            client.print("Click <a href=\"/H\">here</a> turn the LED on<br>");
-            client.print("Click <a href=\"/L\">here</a> turn the LED off<br>");
-
-// Open the file for reading and check that it was successfully opened.
-  // The FILE_READ mode will open the file for reading.
-  File dataFile = fatfs.open(FILE_NAME, FILE_READ);
-  if (dataFile) {
-    // File was opened, now print out data character by character until at the
-    // end of the file.
-    Serial.println("Opened file, printing contents below:");
-    while (dataFile.available()) {
-      // Use the read function to read the next character.
-      // You can alternatively use other functions like readUntil, readString, etc.
-      // See the fatfs_full_usage example for more details.
-      char c = dataFile.read();
-      Serial.print(c);
-      client.print(c);
-    }
-  }
-  else {
-    Serial.println("Failed to open data file! Does it exist?");
-  }
-
-
-
-
-
+            client.print("Get the dataset <a href=\"/H\">here</a> turn the LED on<br>");
+          //  client.print("Click <a href=\"/L\">here</a> turn the LED off<br>");
+            
             // The HTTP response ends with another blank line:
             client.println();
             // break out of the while loop:
@@ -223,7 +199,27 @@ void loop() {
             client.println();
 
             // the content of the HTTP response follows the header:
-            client.print("Goof!<br>");
+
+            // Open the file for reading and check that it was successfully opened.
+  // The FILE_READ mode will open the file for reading.
+  File dataFile = fatfs.open(FILE_NAME, FILE_READ);
+  if (dataFile) {
+    // File was opened, now print out data character by character until at the
+    // end of the file.
+    Serial.println("Opened file, printing contents below:");
+    while (dataFile.available()) {
+      // Use the read function to read the next character.
+      // You can alternatively use other functions like readUntil, readString, etc.
+      // See the fatfs_full_usage example for more details.
+      char c = dataFile.read();
+      Serial.print(c);
+      client.print(c);
+    }
+  }
+  else {
+    Serial.println("Failed to open data file! Does it exist?");
+  }
+  
              client.println();
             
         }

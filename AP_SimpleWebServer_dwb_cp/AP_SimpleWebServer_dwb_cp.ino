@@ -40,10 +40,12 @@ Adafruit_SPIFlash flash(FLASH_SS, &FLASH_SPI_PORT);     // Use hardware SPI
 // Alternatively you can define and use non-SPI pins!
 // Adafruit_SPIFlash flash(FLASH_SCK, FLASH_MISO, FLASH_MOSI, FLASH_SS);
 
-Adafruit_W25Q16BV_FatFs fatfs(flash);
+//Adafruit_W25Q16BV_FatFs fatfs(flash);
+Adafruit_M0_Express_CircuitPython pythonfs(flash);
+
 
 // Configuration for the file to open and read:
-#define FILE_NAME      "data.csv"
+#define FILE_NAME      "data.txt"
 
 
 ///////please enter your sensitive data in the Secret tab/arduino_secrets.h
@@ -67,9 +69,9 @@ void setup() {
 
   // First call begin to mount the filesystem.  Check that it returns true
   // to make sure the filesystem was mounted.
-  if (!fatfs.begin()) {
+  if (!pythonfs.begin()) {
     Serial.println("Error, failed to mount newly formatted filesystem!");
-    Serial.println("Was the flash chip formatted with the fatfs_format example?");
+    Serial.println("Was the flash chip formatted with the pythonfs_format example?");
     while(1);
   }
   Serial.println("Mounted filesystem!");
@@ -97,7 +99,7 @@ void setup() {
 
   // by default the local IP address of will be 192.168.1.1
   // you can override it with the following:
-   WiFi.config(IPAddress(10, 0, 0, 1));
+   WiFi.config(IPAddress(10, 0, 0, 2));
 
   // print the network name (SSID);
   Serial.print("Creating access point named: ");
@@ -112,7 +114,7 @@ void setup() {
   }
 
   // wait 10 seconds for connection:
-  delay(10000);
+  delay(2000);
 
   // start the web server on port 80
   server.begin();
@@ -172,33 +174,9 @@ void loop() {
             client.println();
 
             // the content of the HTTP response follows the header:
-            client.print("Click <a href=\"/H\">here</a> turn the LED on<br>");
-            client.print("Click <a href=\"/L\">here</a> turn the LED off<br>");
-
-// Open the file for reading and check that it was successfully opened.
-  // The FILE_READ mode will open the file for reading.
-  File dataFile = fatfs.open(FILE_NAME, FILE_READ);
-  if (dataFile) {
-    // File was opened, now print out data character by character until at the
-    // end of the file.
-    Serial.println("Opened file, printing contents below:");
-    while (dataFile.available()) {
-      // Use the read function to read the next character.
-      // You can alternatively use other functions like readUntil, readString, etc.
-      // See the fatfs_full_usage example for more details.
-      char c = dataFile.read();
-      Serial.print(c);
-      client.print(c);
-    }
-  }
-  else {
-    Serial.println("Failed to open data file! Does it exist?");
-  }
-
-
-
-
-
+            client.print("Get the dataset <a href=\"/H\">here</a> turn the LED on<br>");
+          //  client.print("Click <a href=\"/L\">here</a> turn the LED off<br>");
+            
             // The HTTP response ends with another blank line:
             client.println();
             // break out of the while loop:
@@ -223,7 +201,27 @@ void loop() {
             client.println();
 
             // the content of the HTTP response follows the header:
-            client.print("Goof!<br>");
+
+            // Open the file for reading and check that it was successfully opened.
+  // The FILE_READ mode will open the file for reading.
+  File dataFile = pythonfs.open(FILE_NAME, FILE_READ);
+  if (dataFile) {
+    // File was opened, now print out data character by character until at the
+    // end of the file.
+    Serial.println("Opened file, printing contents below:");
+    while (dataFile.available()) {
+      // Use the read function to read the next character.
+      // You can alternatively use other functions like readUntil, readString, etc.
+      // See the pythonfs_full_usage example for more details.
+      char c = dataFile.read();
+      Serial.print(c);
+      client.print(c);
+    }
+  }
+  else {
+    Serial.println("Failed to open data file! Does it exist?");
+  }
+  
              client.println();
             
         }
